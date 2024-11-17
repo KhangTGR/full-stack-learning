@@ -1,0 +1,37 @@
+#!/bin/bash
+
+echo "creating deployment ..."
+ID=$(/usr/local/bin/aws deploy create-deployment \
+    --application-name khang-dev-codedeploy-app \
+    --deployment-group-name khang-dev-codedeploy-deployment-group \
+    --revision '{"revisionType": "AppSpecContent", "appSpecContent": {"content": "{\"Hooks\":[],\"Resources\":[{\"TargetService\":{\"Properties\":{\"LoadBalancerInfo\":{\"ContainerName\":\"khang-sample-app\",\"ContainerPort\":5000},\"TaskDefinition\":\"arn:aws:ecs:ap-southeast-1:879654127886:task-definition/khang-sample-app-taskdef:7\"},\"Type\":\"AWS::ECS::Service\"}}],\"version\":\"1\"}", "sha256": "6bf55b68696b00387b2b1fdbc50f941eff91e1276f2f44b0f98ad448b828407b"}}' \
+    --output text \
+    --query '[deploymentId]')
+
+echo "======================================================="
+echo "waiting for deployment $deploymentId to finish ..."
+STATUS=$(/usr/local/bin/aws deploy get-deployment \
+    --deployment-id $ID \
+    --output text \
+    --query '[deploymentInfo.status]')
+
+while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" || $STATUS == "Queued" || $STATUS == "Ready" ]]; do
+    echo "Status: $STATUS..."
+    STATUS=$(/usr/local/bin/aws deploy get-deployment \
+        --deployment-id $ID \
+        --output text \
+        --query '[deploymentInfo.status]')
+
+    SLEEP_TIME=30
+
+    echo "Sleeping for: $SLEEP_TIME Seconds"
+    sleep $SLEEP_TIME
+done
+
+if [[ $STATUS == "Succeeded" ]]; then
+    echo "Deployment succeeded."
+else
+    echo "Deployment failed!"
+    exit 1
+fi
+

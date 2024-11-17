@@ -6,21 +6,22 @@ locals {
 
   # appspec file
   appspec = {
-    version = "0.0"
+    version = "1"
     Resources = [
       {
         TargetService = {
           Type = "AWS::ECS::Service"
           Properties = {
             TaskDefinition = "${var.ecs_task_def_arn}"
-            # LoadBalancerInfo = {
-            #   ContainerName = "${var.container_name}"
-            #   ContainerPort = "${var.container_port}"
-            # }
+            LoadBalancerInfo = {
+              ContainerName = "${var.container_name}"
+              ContainerPort = "${var.container_port}"
+            }
           }
         }
       }
     ]
+    Hooks = []
   }
   appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
   appspec_sha256  = sha256(jsonencode(local.appspec))
@@ -68,17 +69,17 @@ EOF
 
 }
 
-# resource "local_file" "deploy_script" {
-#   filename             = "${path.module}/deploy_script.txt"
-#   directory_permission = "0755"
-#   file_permission      = "0644"
-#   content              = local.script
+resource "local_file" "deploy_script" {
+  filename             = "${path.module}/deploy_script.txt"
+  directory_permission = "0755"
+  file_permission      = "0644"
+  content              = local.script
 
-#   depends_on = [
-#     aws_codedeploy_app.this,
-#     aws_codedeploy_deployment_group.this,
-#   ]
-# }
+  depends_on = [
+    aws_codedeploy_app.this,
+    aws_codedeploy_deployment_group.this,
+  ]
+}
 
 # resource "null_resource" "start_deploy" {
 #   triggers = {

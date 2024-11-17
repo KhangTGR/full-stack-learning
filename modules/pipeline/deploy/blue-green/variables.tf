@@ -61,3 +61,9 @@ variable "alb_green_target_group_name" {
   type        = string
   description = "ALB Green target group name"
 }
+
+variable "tags" {
+  description = "Resource tags"
+  type        = map(string)
+  default     = {}
+}

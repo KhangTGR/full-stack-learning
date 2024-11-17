@@ -47,9 +47,9 @@ module "deployment" {
   environment = var.environment
 
   # Load Balancer
-  alb_blue_target_group_name  = "khang-sample-app-tg"
-  alb_green_target_group_name = "khang-sample-app-tg-2nd"
-  alb_prod_listener_arns      = ["arn:aws:elasticloadbalancing:ap-southeast-1:879654127886:listener/app/khang-sample-app-alb/95ad5c51b27e5e8b/6e48bb4a45453534"]
+  alb_blue_target_group_name  = "khang-sample-tg-blue"
+  alb_green_target_group_name = "khang-sample-tg-green"
+  alb_prod_listener_arns      = ["arn:aws:elasticloadbalancing:ap-southeast-1:879654127886:listener/app/khang-sample-app-alb/95ad5c51b27e5e8b/a1411ba023e74163"]
   alb_test_listener_arns      = []
 
   # Container
@@ -63,4 +63,12 @@ module "deployment" {
 
   # Others
   old_tasks_termination_wait_time = 5
+
+  depends_on = [ module.capacity_provider ]
+
+  # Tags
+  tags = {
+    "Owner"      = "khang.nguyen"
+    "Managed by" = "Terraform"
+  }
 }

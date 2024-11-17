@@ -1,6 +1,11 @@
 resource "aws_codedeploy_app" "this" {
   compute_platform = "ECS"
   name             = local.codedeploy_application_name
+
+  tags = merge(var.tags, {
+    Name        = "${local.codedeploy_application_name}"
+    Environment = "${var.environment}"
+  })
 }
 
 resource "aws_codedeploy_deployment_group" "this" {
@@ -59,4 +64,9 @@ resource "aws_codedeploy_deployment_group" "this" {
   lifecycle {
     ignore_changes = [blue_green_deployment_config]
   }
+
+  tags = merge(var.tags, {
+    Name        = "${local.deployment_group_name}"
+    Environment = "${var.environment}"
+  })
 }
