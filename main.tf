@@ -43,24 +43,24 @@ module "deployment" {
   source = "./modules/pipeline/deploy/blue-green"
 
   # Naming
-  prefix       = var.prefix
-  environment  = var.environment
+  prefix      = var.prefix
+  environment = var.environment
 
   # Load Balancer
-  alb_blue_target_group_name = ""
-  alb_green_target_group_name = ""
-  alb_prod_listener_arns = ""
-  alb_test_listener_arns = ""
+  alb_blue_target_group_name  = "khang-sample-app-tg"
+  alb_green_target_group_name = "khang-sample-app-tg-2nd"
+  alb_prod_listener_arns      = ["arn:aws:elasticloadbalancing:ap-southeast-1:879654127886:listener/app/khang-sample-app-alb/95ad5c51b27e5e8b/6e48bb4a45453534"]
+  alb_test_listener_arns      = []
 
   # Container
-  container_name = ""
-  container_port = ""
+  container_name = "khang-sample-app"
+  container_port = "5000"
 
   # ECS
   ecs_cluster_name = module.cluster.cluster_name
-  ecs_service_name = ""
-  ecs_task_def_arn = ""
+  ecs_service_name = "khang-sample-app-service"
+  ecs_task_def_arn = "arn:aws:ecs:ap-southeast-1:879654127886:task-definition/khang-sample-app-taskdef:7"
 
   # Others
-  old_tasks_termination_wait_time = 300
+  old_tasks_termination_wait_time = 5
 }

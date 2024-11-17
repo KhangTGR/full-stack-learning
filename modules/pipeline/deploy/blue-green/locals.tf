@@ -13,10 +13,10 @@ locals {
           Type = "AWS::ECS::Service"
           Properties = {
             TaskDefinition = "${var.ecs_task_def_arn}"
-            LoadBalancerInfo = {
-              ContainerName = "${var.container_name}"
-              ContainerPort = "${var.container_port}"
-            }
+            # LoadBalancerInfo = {
+            #   ContainerName = "${var.container_name}"
+            #   ContainerPort = "${var.container_port}"
+            # }
           }
         }
       }
@@ -30,7 +30,7 @@ locals {
 #!/bin/bash
 
 echo "creating deployment ..."
-ID=$(aws deploy create-deployment \
+ID=$(/usr/local/bin/aws deploy create-deployment \
     --application-name ${local.codedeploy_application_name} \
     --deployment-group-name ${local.deployment_group_name} \
     --revision '{"revisionType": "AppSpecContent", "appSpecContent": {"content": "${local.appspec_content}", "sha256": "${local.appspec_sha256}"}}' \
@@ -39,14 +39,14 @@ ID=$(aws deploy create-deployment \
 
 echo "======================================================="
 echo "waiting for deployment $deploymentId to finish ..."
-STATUS=$(aws deploy get-deployment \
+STATUS=$(/usr/local/bin/aws deploy get-deployment \
     --deployment-id $ID \
     --output text \
     --query '[deploymentInfo.status]')
 
 while [[ $STATUS == "Created" || $STATUS == "InProgress" || $STATUS == "Pending" || $STATUS == "Queued" || $STATUS == "Ready" ]]; do
     echo "Status: $STATUS..."
-    STATUS=$(aws deploy get-deployment \
+    STATUS=$(/usr/local/bin/aws deploy get-deployment \
         --deployment-id $ID \
         --output text \
         --query '[deploymentInfo.status]')
@@ -68,30 +68,30 @@ EOF
 
 }
 
-resource "local_file" "deploy_script" {
-  filename             = "${path.module}/deploy_script.txt"
-  directory_permission = "0755"
-  file_permission      = "0644"
-  content              = local.script
+# resource "local_file" "deploy_script" {
+#   filename             = "${path.module}/deploy_script.txt"
+#   directory_permission = "0755"
+#   file_permission      = "0644"
+#   content              = local.script
 
-  depends_on = [
-    aws_codedeploy_app.this,
-    aws_codedeploy_deployment_group.this,
-  ]
-}
+#   depends_on = [
+#     aws_codedeploy_app.this,
+#     aws_codedeploy_deployment_group.this,
+#   ]
+# }
 
-resource "null_resource" "start_deploy" {
-  triggers = {
-    appspec_sha256 = local.appspec_sha256 # run only if appspec file changed
-  }
+# resource "null_resource" "start_deploy" {
+#   triggers = {
+#     appspec_sha256 = local.appspec_sha256 # run only if appspec file changed
+#   }
 
-  provisioner "local-exec" {
-    command     = local.script
-    interpreter = ["/bin/bash", "-c"]
-  }
+#   provisioner "local-exec" {
+#     command     = local.script
+#     interpreter = ["/bin/bash", "-c"]
+#   }
 
-  depends_on = [
-    aws_codedeploy_app.this,
-    aws_codedeploy_deployment_group.this,
-  ]
-}
+#   depends_on = [
+#     aws_codedeploy_app.this,
+#     aws_codedeploy_deployment_group.this,
+#   ]
+# }

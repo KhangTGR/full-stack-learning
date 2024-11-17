@@ -60,6 +60,10 @@ resource "aws_launch_template" "ecs_launch_template" {
   user_data = base64encode(<<EOF
 #!/bin/bash
 echo "ECS_CLUSTER=${var.cluster_name}" >> /etc/ecs/ecs.config
+yum install unzip -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+./aws/install
 EOF
   )
 
