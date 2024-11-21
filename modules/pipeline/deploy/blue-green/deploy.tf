@@ -62,7 +62,7 @@ resource "aws_codedeploy_deployment_group" "this" {
   }
 
   lifecycle {
-    ignore_changes = [blue_green_deployment_config]
+    ignore_changes = [blue_green_deployment_config, load_balancer_info[0].target_group_pair_info[0].test_traffic_route]
   }
 
   tags = merge(var.tags, {

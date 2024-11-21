@@ -21,7 +21,6 @@ locals {
         }
       }
     ]
-    Hooks = []
   }
   appspec_content = replace(jsonencode(local.appspec), "\"", "\\\"")
   appspec_sha256  = sha256(jsonencode(local.appspec))
