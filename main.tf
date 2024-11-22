@@ -1,3 +1,17 @@
+module "jenkins" {
+  source = "./modules/jenkins"
+    
+  # Naming
+  prefix      = var.prefix
+  environment = var.environment
+  
+  # Tags
+  tags = {
+    "Owner"      = "khang.nguyen"
+    "Managed by" = "Terraform"
+  }
+}
+
 # module "cluster" {
 #   source = "./modules/ecs/cluster"
 
